@@ -1,1 +1,107 @@
 
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Satellite Signal Model</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    text-align: center;
+}
+
+.container {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    margin: auto;
+}
+
+input {
+    width: 90%;
+    padding: 8px;
+    margin: 5px;
+    border-radius: 5px;
+    border: none;
+}
+
+button {
+    background: #22c55e;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #16a34a;
+}
+
+pre {
+    background: black;
+    padding: 10px;
+    text-align: left;
+}
+</style>
+</head>
+
+<body>
+
+<h2>📡 Atmosfera Signal Modeli</h2>
+
+<div class="container">
+
+<input id="f" placeholder="Chastota (GHz)">
+<input id="theta" placeholder="Elevatsiya (gradus)">
+<input id="R" placeholder="Yomg‘ir (mm/h)">
+<input id="M" placeholder="Bulut (kg/m²)">
+<input id="target" placeholder="Signal (%)">
+
+<button onclick="run()">Hisobla</button>
+
+<pre id="out"></pre>
+
+<img id="snr" width="100%">
+<img id="hist" width="100%">
+
+</div>
+
+<script>
+function run(){
+fetch('/run',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body: JSON.stringify({
+f: f.value,
+theta: theta.value,
+R: R.value,
+M: M.value,
+target: target.value
+})
+})
+.then(r=>r.json())
+.then(d=>{
+document.getElementById("out").innerText =
+"===== NATIJA =====\n"+
+"Signal: "+d.availability+" %\n\n"+
+"===== OPTIMAL SHAROIT =====\n"+
+"Chastota: "+d.best_f+" GHz\n"+
+"Yomg‘ir: "+d.best_R+"\n"+
+"Bulut: "+d.best_M+"\n\n"+
+"===== OPTIMAL CHASTOTA =====\n"+
+"Chastota: "+d.freq_opt+" GHz\n"+
+"Signal: "+d.freq_av+" %";
+
+document.getElementById("snr").src="static/snr.png?"+Date.now();
+document.getElementById("hist").src="static/hist.png?"+Date.now();
+})
+}
+</script>
+
+</body>
+</html>
